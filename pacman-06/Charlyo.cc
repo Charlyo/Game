@@ -78,7 +78,7 @@ struct PLAYER_NAME : public Player {
         return true;
     }
 
-    queue<Dir> fake_bfs(vector< vector<Cell> >& tab, pair<int, int>& p) {
+    queue<Dir> fake_bfs(pair<int, int>& p) {
         vector<int> co(4);
         queue<Dir> cua;
         pair<int, int> min(5000, -1);
