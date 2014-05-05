@@ -1,0 +1,20 @@
+v05:
+    - fixed a bug in the cage position of smile.gam.
+    - improved the scoreboard in the viewer.
+
+v04:
+    - Added new mazes
+    - New viewer with support to load games from the server, to zoom
+      in/out and to get help.
+
+v03:
+    - Added support for Mac in viewer.sh
+    - Added visualization of PacMan rebirths in the viewer.
+    - Removed spurious file.
+
+v02: 
+    - Fixed mistakes in the documentation.
+
+v01: 
+    - First version
+
