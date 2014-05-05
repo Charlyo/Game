@@ -27,7 +27,8 @@ struct PLAYER_NAME : public Player {
     vector<Dir> dirs;
     vector< vector<Cell> >tab;
     queue< pair<int, int> > q;
-    queue<Dir> way;
+    vector<int> s;
+    vector<int> r;
 
     /**
      * Attributes for your player can be defined here.
@@ -46,16 +47,17 @@ struct PLAYER_NAME : public Player {
         if (round() == 0) {
             tab = vector< vector<Cell> >(rows(), vector<Cell> (cols()));
             dirs = vector<Dir>(4);
+            s = vector<int>(4);
+            r = vector<int>(4);
             dirs[0] = Top;
             dirs[1] = Right;
             dirs[2] = Bottom;
             dirs[3] = Left;
             scan(tab, q);
-            way = fake_bfs(q.front());
-        }
-        if (not way.empty()) {
-            move_my_pacman(way.front());
-            way.pop();
+            s[0] = r[3] = -1;
+            s[2] = r[1] = 1;
+            s[3] = r[0] = s[1] = r[2] = 0;
+            cout << distance(pacman(me()).pos.i,pacman(me()).pos.j, tab) << endl;
         }
 
     }
@@ -78,50 +80,37 @@ struct PLAYER_NAME : public Player {
         return true;
     }
 
-    queue<Dir> fake_bfs(pair<int, int>& p) {
-        vector<int> co(4);
-        queue<Dir> cua;
-        pair<int, int> min(5000, -1);
-        Pos aux = pacman(me()).pos;
-        while (aux != Pos(p.first, p.second)) {
-            min = make_pair(aux.i*aux.i+aux.j*aux.j, -1);
-            for (int i = 0; i < 4; ++i) {
-                if (i == 0) {
-                    if (pac_can_move(aux, dirs[i])) {
-                        co[0] = (p.first-aux.i-1)*(p.first-aux.i-1)+(p.second-aux.j)*(p.second-aux.j);
-                        cout << "distancia 0  " << co[0] << endl;
-                    }
-                }
-                else if (i == 1) {
-                    if (pac_can_move(aux, dirs[i])) {
-                        co[1] = (p.first-aux.i)*(p.first-aux.i)+(p.second-aux.j+1)*(p.second-aux.j+1);
-                        cout << "distancia 1  " << co[1] << endl;
-                    }
-                }
-                else if (i == 2) {
-                    if (pac_can_move(aux, dirs[i])) {
-                        co[2] = (p.first-aux.i+1)*(p.first-aux.i+1)+(p.second-aux.j)*(p.second-aux.j);
-                        cout << "distancia 2  " << co[2] << endl;
-                    }
-                }
-                else {
-                    if (pac_can_move(aux, dirs[i])) {
-                        co[3] = (p.first-aux.i)*(p.first-aux.i)+(p.second-aux.j-1)*(p.second-aux.j-1);
-                        cout << "distancia 3  " << co[3] << endl;
-                    }
-                }
-                if (min.first > co[i] and pac_can_move(aux, dirs[i])) {
-                    min.first = co[i];
-                    min.second = i;
-                    cout << "entra " << i << endl;
+
+    bool ok(int f, int c, const vector< vector<Cell> >& map) {
+        return pos_ok(f, c) and map[f][c].type != Wall;
+    }
+
+    int distance(int f0, int c0, const vector< vector<Cell> >& g) {
+        int n = g.size();
+        int m = g[0].size();
+        vector< vector<int> > dst(n, vector<int>(m, -1));
+        queue< pair<int, int> > q;
+        q.push(make_pair(f0,c0));
+        dst[f0][c0] = 0;
+        while (not q.empty()) {
+            int f = q.front().first;
+            int c = q.front().second;
+            q.pop();
+            if (g[f][c].type == Hammer) return dst[f][c];
+            for (int k = 0; k < 4; ++k) {
+                int ff = f + s[k];
+                int cc = c + r[k];
+                if (ok(ff,cc,g) and dst[ff][cc] == -1) {
+                    q.push(make_pair(ff,cc));
+                    dst[ff][cc] = 1 + dst[f][c];
+                    cout << ff << " " << cc << endl;
                 }
             }
-            cout << aux.i << " " << aux.j << endl;
-            cua.push(dirs[min.second]);
-            aux = dest(aux, dirs[min.second]);
         }
-        return cua;
+        return -1;
     }
+
+
 };
 
 RegisterPlayer(PLAYER_NAME);
