@@ -51,7 +51,7 @@ struct PLAYER_NAME : public Player {
             dirs[2] = Bottom;
             dirs[3] = Left;
             scan(tab, q);
-            way = fake_bfs(tab, q.front());
+            way = fake_bfs(q.front());
         }
         if (not way.empty()) {
             move_my_pacman(way.front());
